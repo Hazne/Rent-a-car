@@ -1,0 +1,12 @@
+﻿using System.Collections.Generic;
+
+namespace RentAPI.Models
+{
+    public class TipKorisnika
+    {
+        public int TipKorisnikaId { get; set; }
+        public string Tip { get; set; }
+
+        public ICollection<Korisnik> Korisnik { get; set; }
+    }
+}

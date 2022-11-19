@@ -11,5 +11,17 @@ namespace RentAPI.Data
         {
         }
         public DbSet<Employee> Employees { get; set;}
+        public DbSet<Automobil> Automobils { get; set;}
+        public DbSet<Korisnik> Korisniks { get; set;}
+        public DbSet<Grad> Grads { get; set;}
+        public DbSet<Izdavac> Izdavacs { get; set;}
+        public DbSet<Komentar> Komentars { get; set;}
+        public DbSet<ModelAutomobila> ModelAutomobilas { get; set;}
+        public DbSet<Ocjena> Ocjenas { get; set;}
+        public DbSet<Proizvodjac> Proizvodjacs { get; set;}
+        public DbSet<Rezervisanje> Rezervisanjes { get; set;}
+        public DbSet<TipAutomobila> TipAutomobilas { get; set;}
+        public DbSet<TipGoriva> TipGorivas { get; set;}
+        public DbSet<TipKorisnika> TipKorisnikas { get; set;}
     }
 }
