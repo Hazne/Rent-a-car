@@ -82,7 +82,7 @@ namespace RentAPI.Migrations
 
                     b.HasIndex("TipGorivaId");
 
-                    b.ToTable("Automobils");
+                    b.ToTable("Automobils", (string)null);
                 });
 
             modelBuilder.Entity("RentAPI.Models.Employee", b =>
@@ -108,7 +108,7 @@ namespace RentAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Employees", (string)null);
                 });
 
             modelBuilder.Entity("RentAPI.Models.Grad", b =>
@@ -127,7 +127,7 @@ namespace RentAPI.Migrations
 
                     b.HasKey("GradId");
 
-                    b.ToTable("Grads");
+                    b.ToTable("Grads", (string)null);
                 });
 
             modelBuilder.Entity("RentAPI.Models.Izdavac", b =>
@@ -163,7 +163,7 @@ namespace RentAPI.Migrations
 
                     b.HasIndex("GradId");
 
-                    b.ToTable("Izdavacs");
+                    b.ToTable("Izdavacs", (string)null);
                 });
 
             modelBuilder.Entity("RentAPI.Models.Komentar", b =>
@@ -192,7 +192,7 @@ namespace RentAPI.Migrations
 
                     b.HasIndex("KorisnikId");
 
-                    b.ToTable("Komentars");
+                    b.ToTable("Komentars", (string)null);
                 });
 
             modelBuilder.Entity("RentAPI.Models.Korisnik", b =>
@@ -236,7 +236,7 @@ namespace RentAPI.Migrations
 
                     b.HasIndex("TipKorisnikaId");
 
-                    b.ToTable("Korisniks");
+                    b.ToTable("Korisniks", (string)null);
                 });
 
             modelBuilder.Entity("RentAPI.Models.ModelAutomobila", b =>
@@ -260,7 +260,7 @@ namespace RentAPI.Migrations
 
                     b.HasIndex("ProizvodjacId");
 
-                    b.ToTable("ModelAutomobilas");
+                    b.ToTable("ModelAutomobilas", (string)null);
                 });
 
             modelBuilder.Entity("RentAPI.Models.Ocjena", b =>
@@ -289,7 +289,7 @@ namespace RentAPI.Migrations
 
                     b.HasIndex("KorisnikId");
 
-                    b.ToTable("Ocjenas");
+                    b.ToTable("Ocjenas", (string)null);
                 });
 
             modelBuilder.Entity("RentAPI.Models.Proizvodjac", b =>
@@ -305,7 +305,7 @@ namespace RentAPI.Migrations
 
                     b.HasKey("ProizvodjacId");
 
-                    b.ToTable("Proizvodjacs");
+                    b.ToTable("Proizvodjacs", (string)null);
                 });
 
             modelBuilder.Entity("RentAPI.Models.Rezervisanje", b =>
@@ -340,7 +340,7 @@ namespace RentAPI.Migrations
 
                     b.HasIndex("KorisnikId");
 
-                    b.ToTable("Rezervisanjes");
+                    b.ToTable("Rezervisanjes", (string)null);
                 });
 
             modelBuilder.Entity("RentAPI.Models.TipAutomobila", b =>
@@ -356,7 +356,7 @@ namespace RentAPI.Migrations
 
                     b.HasKey("TipAutomobilaId");
 
-                    b.ToTable("TipAutomobilas");
+                    b.ToTable("TipAutomobilas", (string)null);
                 });
 
             modelBuilder.Entity("RentAPI.Models.TipGoriva", b =>
@@ -372,7 +372,7 @@ namespace RentAPI.Migrations
 
                     b.HasKey("TipGorivaId");
 
-                    b.ToTable("TipGorivas");
+                    b.ToTable("TipGorivas", (string)null);
                 });
 
             modelBuilder.Entity("RentAPI.Models.TipKorisnika", b =>
@@ -388,7 +388,7 @@ namespace RentAPI.Migrations
 
                     b.HasKey("TipKorisnikaId");
 
-                    b.ToTable("TipKorisnikas");
+                    b.ToTable("TipKorisnikas", (string)null);
                 });
 
             modelBuilder.Entity("RentAPI.Models.Automobil", b =>
