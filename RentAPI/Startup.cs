@@ -37,6 +37,7 @@ namespace RentAPI
             services.AddRazorPages();
             services.AddSignalR();
             services.AddSwaggerGen();
+            services.AddCoreAdmin();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,6 +55,10 @@ namespace RentAPI
             app.UseRouting();
 
             app.UseAuthorization();
+
+            //for admin
+            app.UseCoreAdminCustomUrl("myadmin");
+            app.UseCoreAdminCustomTitle("Admin panel za Rentacar");
 
             app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
