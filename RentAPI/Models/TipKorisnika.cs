@@ -8,6 +8,5 @@ namespace RentAPI.Models
         public int TipKorisnikaId { get; set; }
         public string Tip { get; set; }
 
-        public ICollection<Korisnik> Korisnik { get; set; }
     }
 }

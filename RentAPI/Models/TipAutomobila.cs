@@ -9,6 +9,5 @@ namespace RentAPI.Models
         public int TipAutomobilaId { get; set; }
         public string ImeTipa { get; set; }
 
-        public ICollection<Automobil> Automobil { get; set; }
     }
 }

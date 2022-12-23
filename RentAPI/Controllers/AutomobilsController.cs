@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using RentAPI.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using RentAPI.Helper;
 
 namespace RentAPI.Controllers
 {
@@ -20,44 +23,71 @@ namespace RentAPI.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> GetAllAutomobils()
+        public ActionResult<List<Automobil>> GetAllAutomobils()
         {
-            var automobils = await _applicationDbContext.Automobils.ToListAsync();
+            var data = _applicationDbContext.Automobils
+                .Include(s => s.Izdavac)
+                .Include(s => s.TipGoriva)
+                .Include(s => s.TipAutomobila)
+                .Include(s => s.ModelAutomobila)
+                .OrderBy(x => x.AutomobilId).AsQueryable();
 
-            return Ok(automobils);
+            return data.Take(100).ToList();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAutomobil([FromBody] Automobil automobilRequest)
+        public ActionResult<Automobil> AddAutomobil([FromBody] AutomobilVM x)
         {
+            var newAutomobil = new Automobil
+            {
+                Tablice = x.Tablice,
+                Slika = x.Slika,
+                BrojAutomobila = x.BrojAutomobila,
+                CijenaPoDanu = x.CijenaPoDanu,
+                Opis = x.Opis,
+                DatumProizvodnje = x.DatumProizvodnje,
+                Kolometraza = x.Kolometraza,
+                Vuca = x.Vuca,
+                BrojSjedala = x.BrojSjedala,
+                Status = x.Status,
+                IzdavacId = x.IzdavacId,
+                TipGorivaId = x.TipGorivaId,
+                TipAutomobilaId = x.TipAutomobilaId,
+                ModelAutomobilaId = x.ModelAutomobilaId
+            };
 
-            await _applicationDbContext.Automobils.AddAsync(automobilRequest);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Add(newAutomobil);
+            _applicationDbContext.SaveChanges();
 
-            return Ok(automobilRequest);
+            return newAutomobil;
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetAutomobil([FromRoute] int id)
+        public ActionResult GetAutomobil([FromRoute] int id)
         {
-            var automobil = await _applicationDbContext.Automobils.FirstOrDefaultAsync(x => x.AutomobilId == id);
+            var automobil = _applicationDbContext.Automobils
+                .Include(s=>s.Izdavac)
+                .Include(s=>s.TipGoriva)
+                .Include(s=>s.TipAutomobila)
+                .Include(s=>s.ModelAutomobila)
+                .FirstOrDefault(x => x.AutomobilId == id);
 
             if (automobil == null)
-                return NotFound();
+                return BadRequest("Pogresan Id");
 
             return Ok(automobil);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateAutomobil([FromRoute] int id, Automobil updateAutomobilRequest)
+        public ActionResult UpdateAutomobil([FromRoute] int id, AutomobilVM updateAutomobilRequest)
         {
-            var automobil = await _applicationDbContext.Automobils.FindAsync(id);
+            var automobil = _applicationDbContext.Automobils.Find(id);
 
             if (automobil == null)
             {
-                return NotFound();
+                return BadRequest("Pogresan Id");
             }
 
             automobil.BrojAutomobila = updateAutomobilRequest.BrojAutomobila;
@@ -65,19 +95,17 @@ namespace RentAPI.Controllers
             automobil.CijenaPoDanu = updateAutomobilRequest.CijenaPoDanu;
             automobil.DatumProizvodnje = updateAutomobilRequest.DatumProizvodnje;
             automobil.Slika = updateAutomobilRequest.Slika;
-            automobil.TipGoriva = updateAutomobilRequest.TipGoriva;
+            automobil.TipGorivaId = updateAutomobilRequest.TipGorivaId;
             automobil.Tablice = updateAutomobilRequest.Tablice;
             automobil.Vuca = updateAutomobilRequest.Vuca;
             automobil.Kolometraza = updateAutomobilRequest.Kolometraza;
             automobil.Opis = updateAutomobilRequest.Opis;
             automobil.Status = updateAutomobilRequest.Status;
-            automobil.Izdavac = updateAutomobilRequest.Izdavac;
-            automobil.Ocjena = updateAutomobilRequest.Ocjena;
-            automobil.Komentar = updateAutomobilRequest.Komentar;
-            automobil.ModelAutomobila = updateAutomobilRequest.ModelAutomobila;
-            automobil.Rezervisanje = updateAutomobilRequest.Rezervisanje;
+            automobil.IzdavacId = updateAutomobilRequest.IzdavacId;
+            automobil.ModelAutomobilaId = updateAutomobilRequest.ModelAutomobilaId;
+           
 
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.SaveChanges();
             return Ok(automobil);
         }
 

@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using RentAPI.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using RentAPI.Helper;
 
 namespace RentAPI.Controllers
 {
@@ -20,29 +23,37 @@ namespace RentAPI.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> GetAllEmployees()
+        public ActionResult<List<Employee>> GetAllEmployees()
         {
-            var employees = await _applicationDbContext.Employees.ToListAsync();
+           var data = _applicationDbContext.Employees
+                .OrderBy(x=>x.Id).AsQueryable();
 
-            return Ok(employees);
+            return data.Take(100).ToList();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddEmployee([FromBody] Employee employeeRequest)
+        public ActionResult<Employee> AddEmployee([FromBody] EmployeeVM x)
         {
-            employeeRequest.Id = Guid.NewGuid();
+            var newEmployee = new Employee
+            {
+                Name = x.Name,
+                Email = x.Email,
+                Phone = x.Phone,
+                Deparment = x.Deparment,
+                Salary = x.Salary,
+            };
 
-            await _applicationDbContext.Employees.AddAsync(employeeRequest);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Add(newEmployee);
+            _applicationDbContext.SaveChanges();
 
-            return Ok(employeeRequest);
+            return newEmployee;
         }
 
         [HttpGet]
         [Route("{id:Guid}")]
-        public async Task<IActionResult> GetEmployee([FromRoute] Guid id)
+        public ActionResult GetEmployee([FromRoute] Guid id)
         {
-            var employee = await _applicationDbContext.Employees.FirstOrDefaultAsync(x => x.Id == id);
+            var employee = _applicationDbContext.Employees.FirstOrDefault(x => x.Id == id);
 
             if (employee == null)
                 return NotFound();
@@ -52,13 +63,13 @@ namespace RentAPI.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
-        public async Task<IActionResult> UpdateEmployee([FromRoute] Guid id, Employee updateEmployeeRequest)
+        public ActionResult UpdateEmployee([FromRoute] Guid id, EmployeeVM updateEmployeeRequest)
         {
-            var employee =  await _applicationDbContext.Employees.FindAsync(id);
+            var employee =  _applicationDbContext.Employees.Find(id);
 
             if (employee == null)
             {
-                return NotFound();
+                return BadRequest("Pogresan Id");
             }
 
             employee.Name = updateEmployeeRequest.Name;
@@ -67,7 +78,7 @@ namespace RentAPI.Controllers
             employee.Phone = updateEmployeeRequest.Phone;
             employee.Deparment = updateEmployeeRequest.Deparment;
 
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.SaveChanges();
             return Ok(employee);
         }
 

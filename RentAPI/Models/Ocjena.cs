@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RentAPI.Models
 {
@@ -6,11 +7,14 @@ namespace RentAPI.Models
     {
         public int OcjenaId { get; set; }
         public int BrojOcjene { get; set; }
-        public int KorisnikId { get; set; }
-        public int AutomobilId { get; set; }
-        public DateTime DatumOcjene { get; set; }
 
+        [ForeignKey(nameof(Korisnik))]
+        public int KorisnikId { get; set; }
         public Korisnik Korisnik { get; set; }
+
+        [ForeignKey(nameof(Automobil))]
+        public int AutomobilId { get; set; }
         public Automobil Automobil { get; set; }
+        public DateTime DatumOcjene { get; set; }
     }
 }

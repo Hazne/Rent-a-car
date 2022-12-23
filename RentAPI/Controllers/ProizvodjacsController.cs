@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using RentAPI.Data;
 using RentAPI.Models;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RentAPI.Controllers
@@ -16,31 +19,45 @@ namespace RentAPI.Controllers
             _applicationDbContext = applicationDbContext;
         }
 
+        public class ProizvodjacAddVM
+        {
+            public string imeProizvodjaca { get; set; }
+        }
+
+        public class ProizvodjacUpdateVM
+        {
+            public string imeProizvodjaca { get; set; }
+        }
 
         [HttpGet]
 
-        public async Task<IActionResult> GetAllProizvodjacs()
+        public List<Proizvodjac> GetAllProizvodjacs()
         {
-            var proizvodjacs = await _applicationDbContext.Proizvodjacs.ToListAsync();
+            var data = _applicationDbContext.Proizvodjacs
+                .OrderBy(x => x.ProizvodjacId).AsQueryable();
 
-            return Ok(proizvodjacs);
+            return data.Take(100).ToList();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddProizvodjac([FromBody] Proizvodjac proizvodjacRequest)
+        public ActionResult<Proizvodjac> AddProizvodjac([FromBody] ProizvodjacAddVM x)
         {
+            var proizvod = new Proizvodjac
+            {
+                ImeProizvodjaca = x.imeProizvodjaca
+            };
 
-            await _applicationDbContext.Proizvodjacs.AddAsync(proizvodjacRequest);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Add(proizvod);
+            _applicationDbContext.SaveChanges();
 
-            return Ok(proizvodjacRequest);
+            return proizvod;
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetProizvodjac([FromRoute] int id)
+        public ActionResult GetProizvodjac([FromRoute] int id)
         {
-            var proizvodjac = await _applicationDbContext.Proizvodjacs.FirstOrDefaultAsync(x => x.ProizvodjacId == id);
+            var proizvodjac = _applicationDbContext.Proizvodjacs.FirstOrDefault(x => x.ProizvodjacId == id);
 
             if (proizvodjac == null)
                 return NotFound();
@@ -50,20 +67,29 @@ namespace RentAPI.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateProizvodjac([FromRoute] int id, Proizvodjac updateProizvodjacRequest)
+        public ActionResult UpdateProizvodjac([FromRoute] int id, ProizvodjacUpdateVM x)
         {
-            var proizvodjac = await _applicationDbContext.Proizvodjacs.FindAsync(id);
+            Proizvodjac proizvodjac;
 
-            if (proizvodjac == null)
+            if(id == 0)
             {
-                return NotFound();
+                proizvodjac = new Proizvodjac
+                {
+                    ImeProizvodjaca = ""
+                };
+                _applicationDbContext.Add(proizvodjac);
+            }
+            else
+            {
+                proizvodjac = _applicationDbContext.Proizvodjacs.FirstOrDefault(x => x.ProizvodjacId == id);
+                if (proizvodjac == null)
+                    return BadRequest("Pogresan ID");
             }
 
-            proizvodjac.ImeProizvodjaca = updateProizvodjacRequest.ImeProizvodjaca;
-            proizvodjac.ModelAutomobila = updateProizvodjacRequest.ModelAutomobila;
+            proizvodjac.ImeProizvodjaca=x.imeProizvodjaca;
 
-            await _applicationDbContext.SaveChangesAsync();
-            return Ok(proizvodjac);
+            _applicationDbContext.SaveChanges();
+            return GetProizvodjac(proizvodjac.ProizvodjacId);
         }
 
         [HttpDelete]

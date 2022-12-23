@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using RentAPI.Data;
 using RentAPI.Models;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RentAPI.Controllers
@@ -13,34 +15,48 @@ namespace RentAPI.Controllers
         public readonly ApplicationDbContext _applicationDbContext;
         public TipAutomobilasController(ApplicationDbContext applicationDbContext)
         {
-            _applicationDbContext = applicationDbContext;
+            this._applicationDbContext = applicationDbContext;
         }
 
+        public class TipAutomoboilaAddVM
+        {
+            public string ImeTipa { get; set; }
+        }
+        
+        public class TipAutomobilaUpdateVM
+        {
+            public string ImeTipa { get; set; }
+        }
 
         [HttpGet]
 
-        public async Task<IActionResult> GetAllTipAutomobilas()
+        public List<TipAutomobila> GetAllTipAutomobilas()
         {
-            var tipAutomobilas = await _applicationDbContext.TipAutomobilas.ToListAsync();
+            var data = _applicationDbContext.TipAutomobilas
+                .OrderBy(x => x.TipAutomobilaId).AsQueryable();
 
-            return Ok(tipAutomobilas);
+            return data.Take(100).ToList();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddTipAutomobila([FromBody] TipAutomobila tipAutomobilaRequest)
+        public ActionResult<TipAutomobila> AddTipAutomobila([FromBody] TipAutomoboilaAddVM x)
         {
+            var newTipAutomobila = new TipAutomobila
+            {
+                ImeTipa = x.ImeTipa,
+            };
 
-            await _applicationDbContext.TipAutomobilas.AddAsync(tipAutomobilaRequest);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Add(newTipAutomobila);
+            _applicationDbContext.SaveChanges();
 
-            return Ok(tipAutomobilaRequest);
+            return newTipAutomobila;
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetTipAutomobila([FromRoute] int id)
+        public ActionResult GetTipAutomobila([FromRoute] int id)
         {
-            var tipAutomobila = await _applicationDbContext.TipAutomobilas.FirstOrDefaultAsync(x => x.TipAutomobilaId == id);
+            var tipAutomobila = _applicationDbContext.TipAutomobilas.FirstOrDefault(x => x.TipAutomobilaId == id);
 
             if (tipAutomobila == null)
                 return NotFound();
@@ -50,20 +66,29 @@ namespace RentAPI.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateTipAutomobila([FromRoute] int id, TipAutomobila updateTipAutomobilaRequest)
+        public ActionResult UpdateTipAutomobila([FromRoute] int id, TipAutomobilaUpdateVM x)
         {
-            var tipAutomobila = await _applicationDbContext.TipAutomobilas.FindAsync(id);
+            TipAutomobila tipAutomobila;
 
-            if (tipAutomobila == null)
+            if (id == 0)
             {
-                return NotFound();
+                tipAutomobila = new TipAutomobila
+                {
+                    ImeTipa = ""
+                };
+                _applicationDbContext.Add(tipAutomobila);
             }
-            
-            tipAutomobila.ImeTipa = updateTipAutomobilaRequest.ImeTipa;
-            tipAutomobila.Automobil = updateTipAutomobilaRequest.Automobil;
+            else
+            {
+                tipAutomobila= _applicationDbContext.TipAutomobilas.FirstOrDefault(x=>x.TipAutomobilaId==id);
+                if (tipAutomobila == null)
+                    return BadRequest("Pogresan ID");
+            }
 
-            await _applicationDbContext.SaveChangesAsync();
-            return Ok(tipAutomobila);
+            tipAutomobila.ImeTipa = x.ImeTipa;
+
+            _applicationDbContext.SaveChanges();
+            return GetTipAutomobila(tipAutomobila.TipAutomobilaId);
         }
 
         [HttpDelete]

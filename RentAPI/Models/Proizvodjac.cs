@@ -8,6 +8,6 @@ namespace RentAPI.Models
         public int ProizvodjacId { get; set; }
         public string ImeProizvodjaca { get; set; }
 
-        public ICollection<ModelAutomobila> ModelAutomobila { get; set; }
+        
     }
 }

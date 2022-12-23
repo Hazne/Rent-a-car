@@ -3,6 +3,9 @@ using RentAPI.Data;
 using RentAPI.Models;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using RentAPI.Helper;
 
 namespace RentAPI.Controllers
 {
@@ -19,56 +22,68 @@ namespace RentAPI.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> GetAllIzdavacs()
+        public ActionResult<List<Izdavac>> GetAllIzdavacs()
         {
-            var izdavacs = await _applicationDbContext.Izdavacs.ToListAsync();
+            var data = _applicationDbContext.Izdavacs
+                .Include(s => s.Grad)
+                .OrderBy(s => s.IzdavacId).AsQueryable();
 
-            return Ok(izdavacs);
+            return data.Take(100).ToList();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddIzdavac([FromBody] Izdavac izdavacRequest)
+        public ActionResult<Izdavac> AddIzdavac([FromBody] IzdavacVM x)
         {
+            var newIzdavac = new Izdavac
+            {
+                ImeIzdavaca = x.ImeIzdavaca,
+                BrojMobitela = x.BrojMobitela,
+                Adresa = x.Adresa,
+                VrijemeOtvaranja = x.VrijemeOtvaranja,
+                VrijemeZatvaranja = x.VrijemeZatvaranja,
+                Opis = x.Opis,
+                GradId = x.GradId,
+            };
 
-            await _applicationDbContext.Izdavacs.AddAsync(izdavacRequest);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Add(newIzdavac);
+            _applicationDbContext.SaveChanges();
 
-            return Ok(izdavacRequest);
+            return newIzdavac;
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetIzdavac([FromRoute] int id)
+        public ActionResult GetIzdavac([FromRoute] int id)
         {
-            var izdavac = await _applicationDbContext.Izdavacs.FirstOrDefaultAsync(x => x.IzdavacId == id);
+            var izdavac = _applicationDbContext.Izdavacs.Include(x=>x.Grad).FirstOrDefault(x => x.IzdavacId == id);
 
             if (izdavac == null)
-                return NotFound();
+                return BadRequest("Pogresan ID");
 
             return Ok(izdavac);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateIzdavac([FromRoute] int id, Izdavac updateIzdavacRequest)
+        public ActionResult UpdateIzdavac([FromRoute] int id, IzdavacVM x)
         {
-            var izdavac = await _applicationDbContext.Izdavacs.FindAsync(id);
+            var izdavac = _applicationDbContext.Izdavacs.Find(id);
 
             if (izdavac == null)
             {
-                return NotFound();
+                return BadRequest("Pogresan ID");
+
             }
 
-            izdavac.BrojMobitela = updateIzdavacRequest.BrojMobitela;
-            izdavac.Adresa = updateIzdavacRequest.Adresa;
-            izdavac.Automobil = updateIzdavacRequest.Automobil;
-            izdavac.Grad = updateIzdavacRequest.Grad;
-            izdavac.ImeIzdavaca = updateIzdavacRequest.ImeIzdavaca;
-            izdavac.Opis = updateIzdavacRequest.Opis;
-            izdavac.VrijemeOtvaranja = updateIzdavacRequest.VrijemeOtvaranja;
-            izdavac.VrijemeZatvaranja = updateIzdavacRequest.VrijemeZatvaranja;
+            izdavac.BrojMobitela = x.BrojMobitela;
+            izdavac.Adresa = x.Adresa;
+            izdavac.GradId = x.GradId;
+            izdavac.ImeIzdavaca = x.ImeIzdavaca;
+            izdavac.Opis = x.Opis;
+            izdavac.VrijemeOtvaranja = x.VrijemeOtvaranja;
+            izdavac.VrijemeZatvaranja = x.VrijemeZatvaranja;
 
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.SaveChanges();
             return Ok(izdavac);
         }
 
@@ -81,7 +96,8 @@ namespace RentAPI.Controllers
 
             if (izdavac == null)
             {
-                return NotFound();
+                return BadRequest("Pogresan ID");
+
             }
 
             _applicationDbContext.Izdavacs.Remove(izdavac);

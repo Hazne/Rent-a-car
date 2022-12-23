@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using RentAPI.Data;
 using RentAPI.Models;
+using RentAPI.NewFolder;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RentAPI.Controllers
@@ -13,34 +16,40 @@ namespace RentAPI.Controllers
         public readonly ApplicationDbContext _applicationDbContext;
         public GradsController(ApplicationDbContext applicationDbContext)
         {
-            _applicationDbContext = applicationDbContext;
+            this._applicationDbContext = applicationDbContext;
         }
+
 
 
         [HttpGet]
 
-        public async Task<IActionResult> GetAllGrads()
+        public List<Grad> GetAllGrads()
         {
-            var grads = await _applicationDbContext.Grads.ToListAsync();
+            var data = _applicationDbContext.Grads
+                .OrderBy(s => s.GradId).AsQueryable();
 
-            return Ok(grads);
+            return data.Take(100).ToList();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddGrad([FromBody] Grad gradRequest)
+        public ActionResult<Grad> AddGrad([FromBody] GradsVM x)
         {
+            var newGrad = new Grad
+            {
+                ImeGrada = x.ImeGrada,
+                PostanskiKod = x.PostanskiKod,
+            };
 
-            await _applicationDbContext.Grads.AddAsync(gradRequest);
-            await _applicationDbContext.SaveChangesAsync();
-
-            return Ok(gradRequest);
+            _applicationDbContext.Add(newGrad);
+            _applicationDbContext.SaveChanges();
+            return newGrad;
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetGrad([FromRoute] int id)
+        public ActionResult GetGrad([FromRoute] int id)
         {
-            var grad = await _applicationDbContext.Grads.FirstOrDefaultAsync(x => x.GradId == id);
+            var grad = _applicationDbContext.Grads.FirstOrDefault(x => x.GradId == id);
 
             if (grad == null)
                 return NotFound();
@@ -50,21 +59,31 @@ namespace RentAPI.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateGrad([FromRoute] int id, Grad updateGradRequest)
+        public ActionResult UpdateGrad([FromRoute] int id, GradsVM x)
         {
-            var grad = await _applicationDbContext.Grads.FindAsync(id);
+            Grad grad;
 
-            if (grad == null)
+            if (id == 0)
             {
-                return NotFound();
+                grad = new Grad
+                {
+                    ImeGrada = "",
+                    PostanskiKod=""
+                };
+                _applicationDbContext.Add(grad);
+            }
+            else
+            {
+                grad = _applicationDbContext.Grads.FirstOrDefault(x => x.GradId == id);
+                if (grad == null)
+                    return BadRequest("Pogresan ID");
             }
 
-            grad.ImeGrada = updateGradRequest.ImeGrada;
-            grad.PostanskiKod = updateGradRequest.PostanskiKod;
-            grad.Izdavac = updateGradRequest.Izdavac;
+            grad.ImeGrada= x.ImeGrada;
+            grad.PostanskiKod = x.PostanskiKod;
 
-            await _applicationDbContext.SaveChangesAsync();
-            return Ok(grad);
+            _applicationDbContext.SaveChanges();
+            return GetGrad(grad.GradId);
         }
 
         [HttpDelete]

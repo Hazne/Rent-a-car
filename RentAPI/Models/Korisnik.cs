@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RentAPI.Models
 {
@@ -13,13 +14,16 @@ namespace RentAPI.Models
         public string Username { get; set; }
         public string PasswordSalt { get; set; }
         public string PasswordHash { get; set; }
-        public int GradId { get; set; }
-        public int? TipKorisnikaId { get; set; }
 
+        [ForeignKey (nameof(Grad))]
+        public int GradId { get; set; }
         public Grad Grad { get; set; }
+
+
+        [ForeignKey(nameof(TipKorisnika))]
+        public int? TipKorisnikaId { get; set; }
         public TipKorisnika TipKorisnika { get; set; }
-        public ICollection<Rezervisanje> Rezervisanje { get; set; }
-        public ICollection<Komentar> Komentar { get; set; }
-        public ICollection<Ocjena> Ocjena { get; set; }
+
+
     }
 }

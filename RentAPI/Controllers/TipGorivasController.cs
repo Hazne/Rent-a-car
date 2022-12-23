@@ -3,6 +3,8 @@ using RentAPI.Data;
 using RentAPI.Models;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RentAPI.Controllers
 {
@@ -16,31 +18,45 @@ namespace RentAPI.Controllers
             _applicationDbContext = applicationDbContext;
         }
 
+        public class TipGorivaAddVM
+        {
+            public string ImeGoriva { get; set; }
+        }
 
+        public class TipGorivaUpdateVM
+        {
+            public string ImeGoriva { get; set; }
+        }
+      
         [HttpGet]
 
-        public async Task<IActionResult> GetAllTipGorivas()
+        public List<TipGoriva> GetAllTipGorivas()
         {
-            var tipGorivas = await _applicationDbContext.TipGorivas.ToListAsync();
+            var data = _applicationDbContext.TipGorivas
+                .OrderBy(x => x.TipGorivaId).AsQueryable();
 
-            return Ok(tipGorivas);
+            return data.Take(100).ToList();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddTipGoriva([FromBody] TipGoriva tipGorivaRequest)
+        public ActionResult<TipGoriva> AddTipGoriva([FromBody] TipGorivaAddVM x)
         {
+            var newTipGoriva = new TipGoriva
+            {
+                ImeGoriva = x.ImeGoriva
+            };
 
-            await _applicationDbContext.TipGorivas.AddAsync(tipGorivaRequest);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Add(newTipGoriva);
+            _applicationDbContext.SaveChanges();
 
-            return Ok(tipGorivaRequest);
+            return newTipGoriva;
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetTipGoriva([FromRoute] int id)
+        public ActionResult GetTipGoriva([FromRoute] int id)
         {
-            var tipGoriva = await _applicationDbContext.TipGorivas.FirstOrDefaultAsync(x => x.TipGorivaId == id);
+            var tipGoriva = _applicationDbContext.TipGorivas.FirstOrDefault(x => x.TipGorivaId == id);
 
             if (tipGoriva == null)
                 return NotFound();
@@ -50,20 +66,29 @@ namespace RentAPI.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateTipGoriva([FromRoute] int id, TipGoriva updateTipGorivaRequest)
+        public ActionResult UpdateTipGoriva([FromRoute] int id, TipGorivaUpdateVM x)
         {
-            var tipGoriva = await _applicationDbContext.TipGorivas.FindAsync(id);
+            TipGoriva tipGoriva;
 
-            if (tipGoriva == null)
+            if (id == 0)
             {
-                return NotFound();
+                tipGoriva = new TipGoriva
+                {
+                    ImeGoriva = ""
+                };
+                _applicationDbContext.Add(tipGoriva);
+            }
+            else
+            {
+                tipGoriva = _applicationDbContext.TipGorivas.FirstOrDefault(x => x.TipGorivaId == id);
+                if (tipGoriva == null)
+                    return BadRequest("Pogresan ID");
             }
 
-            tipGoriva.ImeGoriva = updateTipGorivaRequest.ImeGoriva;
-            tipGoriva.Automobil = updateTipGorivaRequest.Automobil;
+            tipGoriva.ImeGoriva = x.ImeGoriva;
 
-            await _applicationDbContext.SaveChangesAsync();
-            return Ok(tipGoriva);
+            _applicationDbContext.SaveChanges();
+            return GetTipGoriva(tipGoriva.TipGorivaId);
         }
 
         [HttpDelete]

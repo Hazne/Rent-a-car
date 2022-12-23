@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RentAPI.Models
 {
@@ -8,9 +9,9 @@ namespace RentAPI.Models
         public int ModelAutomobilaId { get; set; }
         public string ImeModela { get; set; }
         public string Opis { get; set; }
-        public int ProizvodjacId { get; set; }
-
+        [ForeignKey(nameof(Proizvodjac))]
+        public int? ProizvodjacId { get; set; }
         public Proizvodjac Proizvodjac { get; set; }
-        public ICollection<Automobil> Automobil { get; set; }
+
     }
 }

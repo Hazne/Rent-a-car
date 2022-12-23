@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RentAPI.Data;
+using RentAPI.Helper;
 using RentAPI.Models;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RentAPI.Controllers
@@ -19,51 +22,61 @@ namespace RentAPI.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> GetAllKomentars()
+        public ActionResult<List<Komentar>> GetAllKomentars()
         {
-            var komentars = await _applicationDbContext.Komentars.ToListAsync();
+            var data = _applicationDbContext.Komentars
+                .Include(x=>x.Korisnik)
+                .Include(x=>x.Automobil)
+                .OrderBy(x => x.KomentarId)
+                .AsQueryable();
 
-            return Ok(komentars);
+            return data.Take(100).ToList();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddKomentar([FromBody] Komentar komentarRequest)
+        public ActionResult<Komentar> AddKomentar([FromBody] KomentarVM x)
         {
+            var newKomentar = new Komentar()
+            {
+                Opis = x.Opis,
+                DatumKomentara = x.DatumKomentara,
+                KorisnikId = x.KorisnikId,
+                AutomobilId = x.AutomobilId,
+            };
 
-            await _applicationDbContext.Komentars.AddAsync(komentarRequest);
-            await _applicationDbContext.SaveChangesAsync();
-
-            return Ok(komentarRequest);
+            _applicationDbContext.Add(newKomentar);
+            _applicationDbContext.SaveChanges();
+            return newKomentar;
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetKomentar([FromRoute] int id)
+        public ActionResult GetKomentar([FromRoute] int id)
         {
-            var komentar = await _applicationDbContext.Komentars.FirstOrDefaultAsync(x => x.KomentarId == id);
+            var komentar = _applicationDbContext.Komentars.FirstOrDefault(x => x.KomentarId == id);
 
             if (komentar == null)
-                return NotFound();
+                return BadRequest("Pogresan Id");
 
             return Ok(komentar);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateKomentar([FromRoute] int id, Komentar updateKomentarRequest)
+        public ActionResult UpdateKomentar([FromRoute] int id, Komentar updateKomentarRequest)
         {
-            var komentar = await _applicationDbContext.Komentars.FindAsync(id);
+            var komentar = _applicationDbContext.Komentars.Find(id);
 
             if (komentar == null)
             {
-                return NotFound();
+                return BadRequest("Pogresan Id");
             }
 
             komentar.Automobil = updateKomentarRequest.Automobil;
             komentar.Opis = updateKomentarRequest.Opis;
             komentar.DatumKomentara = updateKomentarRequest.DatumKomentara;
 
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.SaveChanges();
             return Ok(komentar);
         }
 

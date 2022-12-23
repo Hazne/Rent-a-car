@@ -3,6 +3,9 @@ using RentAPI.Data;
 using RentAPI.Models;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using RentAPI.Helper;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RentAPI.Controllers
 {
@@ -19,59 +22,77 @@ namespace RentAPI.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> GetAllKorisniks()
+        public ActionResult<List<Korisnik>> GetAllKorisniks()
         {
-            var korisniks = await _applicationDbContext.Korisniks.ToListAsync();
+            var data = _applicationDbContext.Korisniks
+                .Include(s=>s.Grad)
+                .Include(x=>x.TipKorisnika)
+                .OrderBy(x=>x.KorisnikId)
+                .AsQueryable();
 
-            return Ok(korisniks);
+            return data.Take(100).ToList();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddKorisnik([FromBody] Korisnik korisnikRequest)
+        public ActionResult<Korisnik> AddKorisnik([FromBody] KorisnikVM x)
         {
+            var newKorisnik = new Korisnik
+            {
+                Ime = x.ime,
+                Prezime = x.prezime,
+                BrojMobitela = x.brojMobitela,
+                Email = x.email,
+                Username = x.username,
+                PasswordSalt = x.passwordSalt,
+                GradId = x.gradId,
+                TipKorisnikaId = x.tipKorisnikaId
+            };
 
-            await _applicationDbContext.Korisniks.AddAsync(korisnikRequest);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Add(newKorisnik);
+            _applicationDbContext.SaveChanges();
 
-            return Ok(korisnikRequest);
+            return newKorisnik;
+            
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetKorisnik([FromRoute] int id)
+        public ActionResult GetKorisnik([FromRoute] int id)
         {
-            var korisnik = await _applicationDbContext.Korisniks.FirstOrDefaultAsync(x => x.KorisnikId == id);
+            var korisnik = _applicationDbContext.Korisniks
+                .Include(x=>x.TipKorisnika)
+                .Include(x=>x.Grad)
+                .FirstOrDefault(x => x.KorisnikId == id);
 
             if (korisnik == null)
-                return NotFound();
+                return BadRequest("Pogresan ID");
 
             return Ok(korisnik);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateKorisnik([FromRoute] int id, Korisnik updateKorisnikRequest)
+        public ActionResult UpdateKorisnik([FromRoute] int id, KorisnikVM x)
         {
-            var korisnik = await _applicationDbContext.Korisniks.FindAsync(id);
+            var korisnik = _applicationDbContext.Korisniks.Find(id);
 
             if (korisnik == null)
             {
-                return NotFound();
+                return BadRequest("Pogresan ID");
+
             }
 
-            korisnik.Ime = updateKorisnikRequest.Ime;
-            korisnik.Prezime = updateKorisnikRequest.Prezime;
-            korisnik.Email = updateKorisnikRequest.Email;
-            korisnik.BrojMobitela = updateKorisnikRequest.BrojMobitela;
-            korisnik.Username = updateKorisnikRequest.Username;
-            korisnik.Ocjena = updateKorisnikRequest.Ocjena;
-            korisnik.Grad = updateKorisnikRequest.Grad;
-            korisnik.TipKorisnika = updateKorisnikRequest.TipKorisnika;
-            korisnik.Komentar = updateKorisnikRequest.Komentar;
-            korisnik.Rezervisanje = updateKorisnikRequest.Rezervisanje;
+            korisnik.Ime = x.ime;
+            korisnik.Prezime = x.prezime;
+            korisnik.Email = x.email;
+            korisnik.BrojMobitela = x.brojMobitela;
+            korisnik.Username = x.username;
+            korisnik.GradId = x.gradId;
+            korisnik.TipKorisnikaId = x.tipKorisnikaId;
+           
 
 
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.SaveChanges();
             return Ok(korisnik);
         }
 
