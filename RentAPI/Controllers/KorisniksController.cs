@@ -70,6 +70,19 @@ namespace RentAPI.Controllers
             return Ok(korisnik);
         }
 
+        [HttpPost ("LoginUser")]
+        public IActionResult Login(Login user)
+        {
+            var korisnikPostoji = _applicationDbContext.Korisniks.Where(x => x.Email == user.Email && x.PasswordSalt == user.Pwd).FirstOrDefault();
+
+            if(korisnikPostoji != null)
+            {
+                return Ok("Uspjesno");
+            }
+
+            return Ok("Neuspjesno");
+        }
+
         [HttpPut]
         [Route("{id}")]
         public ActionResult UpdateKorisnik([FromRoute] int id, KorisnikVM x)
