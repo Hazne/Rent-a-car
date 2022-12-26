@@ -37,6 +37,7 @@ namespace RentAPI
             services.AddRazorPages();
             services.AddSignalR();
             services.AddSwaggerGen();
+            services.AddCoreAdmin();
             //added theese two lines of code
             services.AddControllers().AddNewtonsoftJson(options =>
                  options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -57,6 +58,11 @@ namespace RentAPI
             app.UseRouting();
 
             app.UseAuthorization();
+
+            //for admin
+            app.UseCoreAdminCustomUrl("myadmin");
+            app.UseCoreAdminCustomTitle("Admin panel za Rentacar");
+
 
             app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
