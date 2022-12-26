@@ -14,6 +14,7 @@ namespace RentAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("AllowOrigin")]
     public class KorisniksController : Controller
     {
         public readonly ApplicationDbContext _applicationDbContext;
