@@ -10,7 +10,6 @@ namespace RentAPI.Data
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
         }
-        public DbSet<Employee> Employees { get; set;}
         public DbSet<Automobil> Automobils { get; set;}
         public DbSet<Korisnik> Korisniks { get; set;}
         public DbSet<Grad> Grads { get; set;}

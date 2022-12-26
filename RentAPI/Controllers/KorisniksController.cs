@@ -36,28 +36,6 @@ namespace RentAPI.Controllers
             return data.Take(100).ToList();
         }
 
-        [HttpPost]
-        public ActionResult<Korisnik> AddKorisnik([FromBody] KorisnikVM x)
-        {
-            var newKorisnik = new Korisnik
-            {
-                Ime = x.ime,
-                Prezime = x.prezime,
-                BrojMobitela = x.brojMobitela,
-                Email = x.email,
-                Username = x.username,
-                PasswordSalt = x.passwordSalt,
-                GradId = x.gradId,
-                TipKorisnikaId = x.tipKorisnikaId
-            };
-
-            _applicationDbContext.Add(newKorisnik);
-            _applicationDbContext.SaveChanges();
-
-            return newKorisnik;
-            
-        }
-
         [HttpPost("CreateUser")]
         public IActionResult Create(Register user)
         {
@@ -81,7 +59,7 @@ namespace RentAPI.Controllers
                 Email = user.Email,
                 BrojMobitela = user.BrojMobitela,
                 Username = user.Username,
-                PasswordSalt = user.Password,
+                Password = user.Password,
                 Grad = noviGrad,
             };
           
@@ -109,7 +87,7 @@ namespace RentAPI.Controllers
         [HttpPost ("LoginUser")]
         public IActionResult Login(Login user)
         {
-            var korisnikPostoji = _applicationDbContext.Korisniks.Where(x => x.Email == user.Email && x.PasswordSalt == user.Pwd).FirstOrDefault();
+            var korisnikPostoji = _applicationDbContext.Korisniks.Where(x => x.Email == user.Email && x.Password == user.Pwd).FirstOrDefault();
 
             if(korisnikPostoji != null)
             {
