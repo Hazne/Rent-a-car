@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using RentAPI.Helper;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Cors;
+using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography.X509Certificates;
 
 namespace RentAPI.Controllers
 {
@@ -53,6 +56,39 @@ namespace RentAPI.Controllers
 
             return newKorisnik;
             
+        }
+
+        [HttpPost("CreateUser")]
+        public IActionResult Create(Register user)
+        {
+            if(_applicationDbContext.Korisniks.Where(x=>x.Email == user.Email).FirstOrDefault() != null)
+            {
+                return Ok("AlreadyExist");
+            }
+            if(_applicationDbContext.Korisniks.Where(u=>u.Username == user.Username).FirstOrDefault() != null)
+            {
+                return Ok("AlredyExistUser");
+            }
+            var noviGrad = new Grad()
+            {
+                ImeGrada = user.Grad
+            };
+
+            var noviKorisnik = new Korisnik
+            {
+                Ime = user.Ime,
+                Prezime = user.Prezime,
+                Email = user.Email,
+                BrojMobitela = user.BrojMobitela,
+                Username = user.Username,
+                PasswordSalt = user.Password,
+                Grad = noviGrad,
+            };
+          
+
+            _applicationDbContext.Add(noviKorisnik);
+            _applicationDbContext.SaveChanges();
+            return Ok("Success");
         }
 
         [HttpGet]
