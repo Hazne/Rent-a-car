@@ -48,10 +48,24 @@ namespace RentAPI.Controllers
             {
                 return Ok("AlredyExistUser");
             }
-            var noviGrad = new Grad()
+            //var postojeciGrad ="";
+            Grad postojeciGrad;
+
+            if (_applicationDbContext.Grads.Where(x => x.ImeGrada.ToLower() == user.Grad.ToLower()).FirstOrDefault() != null)
             {
-                ImeGrada = user.Grad
-            };
+                postojeciGrad=_applicationDbContext.Grads.Where(x=>x.ImeGrada.ToLower() == user.Grad.ToLower()).FirstOrDefault(x=>x.ImeGrada == user.Grad);
+
+                //return Ok("asdsa");
+            }
+            else
+            {
+                postojeciGrad = new Grad()
+                {
+                    ImeGrada = user.Grad.ToLower()
+                };
+            }
+
+            
 
             var noviKorisnik = new Korisnik
             {
@@ -61,7 +75,8 @@ namespace RentAPI.Controllers
                 BrojMobitela = user.BrojMobitela,
                 Username = user.Username,
                 Password = user.Password,
-                Grad = noviGrad,
+                Grad = postojeciGrad,
+                TipKorisnika=_applicationDbContext.TipKorisnikas.Where(x=>x.TipKorisnikaId == 1).First()
             };
           
 
