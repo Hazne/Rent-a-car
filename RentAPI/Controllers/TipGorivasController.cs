@@ -64,9 +64,8 @@ namespace RentAPI.Controllers
             return Ok(tipGoriva);
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public ActionResult UpdateTipGoriva([FromRoute] int id, TipGorivaUpdateVM x)
+        [HttpPost("{id}")]
+        public ActionResult UpdateTipGoriva(int id,[FromBody] TipGorivaUpdateVM x)
         {
             TipGoriva tipGoriva;
 
@@ -88,14 +87,13 @@ namespace RentAPI.Controllers
             tipGoriva.ImeGoriva = x.ImeGoriva;
 
             _applicationDbContext.SaveChanges();
-            return GetTipGoriva(tipGoriva.TipGorivaId);
+            return Ok(tipGoriva);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteTipGoriva([FromRoute] int id)
+        [HttpDelete("{id}")]
+        public ActionResult DeleteTipGoriva(int id)
         {
-            var tipGoriva = await _applicationDbContext.TipGorivas.FindAsync(id);
+            var tipGoriva = _applicationDbContext.TipGorivas.Find(id);
 
 
             if (tipGoriva == null)
@@ -103,9 +101,26 @@ namespace RentAPI.Controllers
                 return NotFound();
             }
 
-            _applicationDbContext.TipGorivas.Remove(tipGoriva);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Remove(tipGoriva);
+            _applicationDbContext.SaveChangesAsync();
             return Ok(tipGoriva);
         }
+
+        //[HttpDelete]
+        //[Route("{id}")]
+        //public async Task<IActionResult> DeleteTipGoriva([FromRoute] int id)
+        //{
+        //    var tipGoriva = await _applicationDbContext.TipGorivas.FindAsync(id);
+
+
+        //    if (tipGoriva == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    _applicationDbContext.TipGorivas.Remove(tipGoriva);
+        //    await _applicationDbContext.SaveChangesAsync();
+        //    return Ok(tipGoriva);
+        //}
     }
 }
