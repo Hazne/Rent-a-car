@@ -61,9 +61,8 @@ namespace RentAPI.Controllers
             return Ok(modelAutomobila);
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public ActionResult UpdateModelAutomobila([FromRoute] int id, ModelAutomobilaVM x)
+        [HttpPost("{id}")]
+        public ActionResult UpdateModelAutomobila(int id,[FromBody] ModelAutomobilaVM x)
         {
             ModelAutomobila modelAutomobila;
 
@@ -89,14 +88,14 @@ namespace RentAPI.Controllers
             modelAutomobila.ProizvodjacId= x.proizvodjacId;
 
             _applicationDbContext.SaveChanges();
-            return GetModelAutomobila(modelAutomobila.ModelAutomobilaId);
+            return Ok(modelAutomobila);
         }
 
         [HttpDelete]
         [Route("{id}")]
-        public async Task<IActionResult> DeleteModelAutomobila([FromRoute] int id)
+        public  ActionResult DeleteModelAutomobila(int id)
         {
-            var modelAutomobila = await _applicationDbContext.ModelAutomobilas.FindAsync(id);
+            var modelAutomobila = _applicationDbContext.ModelAutomobilas.Find(id);
 
 
             if (modelAutomobila == null)
@@ -104,8 +103,8 @@ namespace RentAPI.Controllers
                 return NotFound();
             }
 
-            _applicationDbContext.ModelAutomobilas.Remove(modelAutomobila);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Remove(modelAutomobila);
+            _applicationDbContext.SaveChangesAsync();
             return Ok(modelAutomobila);
         }
     }
