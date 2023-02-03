@@ -65,9 +65,8 @@ namespace RentAPI.Controllers
             return Ok(proizvodjac);
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public ActionResult UpdateProizvodjac([FromRoute] int id, ProizvodjacUpdateVM x)
+        [HttpPost("{id}")]
+        public ActionResult UpdateProizvodjac(int id,[FromBody] ProizvodjacUpdateVM x)
         {
             Proizvodjac proizvodjac;
 
@@ -89,14 +88,13 @@ namespace RentAPI.Controllers
             proizvodjac.ImeProizvodjaca=x.imeProizvodjaca;
 
             _applicationDbContext.SaveChanges();
-            return GetProizvodjac(proizvodjac.ProizvodjacId);
+            return Ok(proizvodjac);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteProizvodjac([FromRoute] int id)
+        [HttpDelete("{id}")]
+        public ActionResult DeleteProizvodjac(int id)
         {
-            var proizvodjac = await _applicationDbContext.Proizvodjacs.FindAsync(id);
+            var proizvodjac = _applicationDbContext.Proizvodjacs.Find(id);
 
 
             if (proizvodjac == null)
@@ -104,8 +102,8 @@ namespace RentAPI.Controllers
                 return NotFound();
             }
 
-            _applicationDbContext.Proizvodjacs.Remove(proizvodjac);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Remove(proizvodjac);
+            _applicationDbContext.SaveChanges();
             return Ok(proizvodjac);
         }
     }
