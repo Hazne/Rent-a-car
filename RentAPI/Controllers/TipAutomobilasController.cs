@@ -64,9 +64,8 @@ namespace RentAPI.Controllers
             return Ok(tipAutomobila);
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public ActionResult UpdateTipAutomobila([FromRoute] int id, TipAutomobilaUpdateVM x)
+        [HttpPost("{id}")]
+        public ActionResult UpdateTipAutomobila(int id, [FromBody] TipAutomobilaUpdateVM x)
         {
             TipAutomobila tipAutomobila;
 
@@ -88,14 +87,13 @@ namespace RentAPI.Controllers
             tipAutomobila.ImeTipa = x.ImeTipa;
 
             _applicationDbContext.SaveChanges();
-            return GetTipAutomobila(tipAutomobila.TipAutomobilaId);
+            return Ok(tipAutomobila);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteTipAutomobila([FromRoute] int id)
+        [HttpDelete("{id}")]
+        public ActionResult DeleteTipAutomobila(int id)
         {
-            var tipAutomobila = await _applicationDbContext.TipAutomobilas.FindAsync(id);
+            var tipAutomobila = _applicationDbContext.TipAutomobilas.Find(id);
 
 
             if (tipAutomobila == null)
@@ -103,8 +101,8 @@ namespace RentAPI.Controllers
                 return NotFound();
             }
 
-            _applicationDbContext.TipAutomobilas.Remove(tipAutomobila);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Remove(tipAutomobila);
+            _applicationDbContext.SaveChangesAsync();
             return Ok(tipAutomobila);
         }
     }
