@@ -57,9 +57,8 @@ namespace RentAPI.Controllers
             return Ok(grad);
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public ActionResult UpdateGrad([FromRoute] int id, GradsVM x)
+        [HttpPost("{id}")]
+        public ActionResult UpdateGrad(int id,[FromBody] GradsVM x)
         {
             Grad grad;
 
@@ -83,14 +82,13 @@ namespace RentAPI.Controllers
             grad.PostanskiKod = x.PostanskiKod;
 
             _applicationDbContext.SaveChanges();
-            return GetGrad(grad.GradId);
+            return Ok(grad);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteGrad([FromRoute] int id)
+        [HttpDelete("{id}")]
+        public ActionResult DeleteGrad(int id)
         {
-            var grad = await _applicationDbContext.Grads.FindAsync(id);
+            var grad = _applicationDbContext.Grads.Find(id);
 
 
             if (grad == null)
@@ -99,7 +97,7 @@ namespace RentAPI.Controllers
             }
 
             _applicationDbContext.Grads.Remove(grad);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.SaveChanges();
             return Ok(grad);
         }
     }
