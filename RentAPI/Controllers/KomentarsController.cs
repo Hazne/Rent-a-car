@@ -65,7 +65,7 @@ namespace RentAPI.Controllers
         [HttpPost("{id}")]
         public ActionResult UpdateKomentar(int id,[FromBody] Komentar updateKomentarRequest)
         {
-            var komentar = _applicationDbContext.Komentars.Find(id);
+            Komentar komentar;
 
             if (id == 0)
             {
@@ -75,10 +75,13 @@ namespace RentAPI.Controllers
                 };
                 _applicationDbContext.Add(komentar);
             }
-
-            if (komentar == null)
+            else
             {
-                return BadRequest("Pogresan Id");
+                komentar = _applicationDbContext.Komentars.Find(id);
+                if (komentar == null)
+                {   
+                    return BadRequest("Pogresan Id");
+                }
             }
 
             komentar.Automobil = updateKomentarRequest.Automobil;
