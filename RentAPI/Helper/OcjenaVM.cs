@@ -9,6 +9,7 @@ namespace RentAPI.Helper
         public int BrojOcjene { get; set; }
 
         public int KorisnikId { get; set; }
+        
         public int AutomobilId { get; set; }
         public DateTime DatumOcjene { get; set; }
     }

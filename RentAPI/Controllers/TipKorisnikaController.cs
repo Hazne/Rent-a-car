@@ -66,9 +66,8 @@ namespace RentAPI.Controllers
             return Ok(tipKorisnika);
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public ActionResult UpdateTipKorisnika([FromRoute] int id, TipKorisnikaUpdateVM x)
+        [HttpPost("{id}")]
+        public ActionResult UpdateTipKorisnika(int id,[FromBody] TipKorisnikaUpdateVM x)
         {
             TipKorisnika tipKorisnika;
 
@@ -91,14 +90,13 @@ namespace RentAPI.Controllers
 
             _applicationDbContext.SaveChanges();
 
-            return GetTipKorisnika(tipKorisnika.TipKorisnikaId);
+            return Ok(tipKorisnika);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteTipKorisnika([FromRoute] int id)
+        [HttpDelete("{id}")]
+        public ActionResult DeleteTipKorisnika(int id)
         {
-            var tipKorisnika = await _applicationDbContext.TipKorisnikas.FindAsync(id);
+            var tipKorisnika = _applicationDbContext.TipKorisnikas.Find(id);
 
 
             if (tipKorisnika == null)
@@ -106,8 +104,8 @@ namespace RentAPI.Controllers
                 return NotFound();
             }
 
-            _applicationDbContext.TipKorisnikas.Remove(tipKorisnika);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Remove(tipKorisnika);
+            _applicationDbContext.SaveChanges();
             return Ok(tipKorisnika);
         }
     }

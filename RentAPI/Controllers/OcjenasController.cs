@@ -64,32 +64,42 @@ namespace RentAPI.Controllers
             return newOcjena;
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public ActionResult UpdateOcjena([FromRoute] int id, OcjenaVM x)
+        [HttpPost("{id}")]
+        public ActionResult UpdateOcjena(int id,[FromBody] OcjenaVM x)
         {
-            var ocjena = _applicationDbContext.Ocjenas.Find(id);
+            Ocjena ocjena;
 
-            if (ocjena == null)
+            if (id == 0)
             {
-                return BadRequest("Pogresan ID");
-
+                ocjena = new Ocjena
+                {
+                    DatumOcjene = DateTime.Now
+                };
+                _applicationDbContext.Add(ocjena);
+            }
+            else
+            {
+                ocjena = _applicationDbContext.Ocjenas.FirstOrDefault(x => x.OcjenaId == id);
+                if (ocjena == null)
+                {
+                    return BadRequest("Pogresan ID");
+                }
             }
 
             ocjena.BrojOcjene = x.BrojOcjene;
             ocjena.DatumOcjene = x.DatumOcjene;
             ocjena.AutomobilId = x.AutomobilId;
+            ocjena.KorisnikId = x.KorisnikId;
             
 
             _applicationDbContext.SaveChanges();
             return Ok(ocjena);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteOcjena([FromRoute] Guid id)
+        [HttpDelete("{id}")]
+        public ActionResult DeleteOcjena(int id)
         {
-            var ocjena = await _applicationDbContext.Ocjenas.FindAsync(id);
+            var ocjena = _applicationDbContext.Ocjenas.Find(id);
 
 
             if (ocjena == null)
@@ -97,8 +107,8 @@ namespace RentAPI.Controllers
                 return NotFound();
             }
 
-            _applicationDbContext.Ocjenas.Remove(ocjena);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Remove(ocjena);
+            _applicationDbContext.SaveChanges();
             return Ok(ocjena);
         }
 
