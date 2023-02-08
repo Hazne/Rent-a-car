@@ -6,6 +6,7 @@ using RentAPI.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace RentAPI.Controllers
 {
@@ -61,11 +62,19 @@ namespace RentAPI.Controllers
             return Ok(komentar);
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public ActionResult UpdateKomentar([FromRoute] int id, Komentar updateKomentarRequest)
+        [HttpPost("{id}")]
+        public ActionResult UpdateKomentar(int id,[FromBody] Komentar updateKomentarRequest)
         {
             var komentar = _applicationDbContext.Komentars.Find(id);
+
+            if (id == 0)
+            {
+                komentar = new Komentar()
+                {
+                    DatumKomentara = DateTime.Now
+                };
+                _applicationDbContext.Add(komentar);
+            }
 
             if (komentar == null)
             {
@@ -73,18 +82,19 @@ namespace RentAPI.Controllers
             }
 
             komentar.Automobil = updateKomentarRequest.Automobil;
+            komentar.AutomobilId = updateKomentarRequest.AutomobilId;
             komentar.Opis = updateKomentarRequest.Opis;
-            komentar.DatumKomentara = updateKomentarRequest.DatumKomentara;
+            komentar.KorisnikId = updateKomentarRequest.KorisnikId;
+            komentar.Korisnik = updateKomentarRequest.Korisnik;
 
             _applicationDbContext.SaveChanges();
             return Ok(komentar);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteKomentar([FromRoute] int id)
+        [HttpDelete("{id}")]
+        public ActionResult DeleteKomentar(int id)
         {
-            var komentar = await _applicationDbContext.Komentars.FindAsync(id);
+            var komentar = _applicationDbContext.Komentars.Find(id);
 
 
             if (komentar == null)
@@ -92,8 +102,8 @@ namespace RentAPI.Controllers
                 return NotFound();
             }
 
-            _applicationDbContext.Komentars.Remove(komentar);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Remove(komentar);
+            _applicationDbContext.SaveChanges();
             return Ok(komentar);
         }
     }
