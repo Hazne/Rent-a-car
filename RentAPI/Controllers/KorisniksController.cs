@@ -137,16 +137,26 @@ namespace RentAPI.Controllers
 
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public ActionResult UpdateKorisnik([FromRoute] int id, KorisnikVM x)
+        [HttpPost("{id}")]
+        public ActionResult UpdateKorisnik(int id,[FromBody] KorisnikVM x)
         {
-            var korisnik = _applicationDbContext.Korisniks.Find(id);
+            Korisnik korisnik;
 
-            if (korisnik == null)
+            //TREBA SE IMPLEMENTIRAT IF/OGRANIČENJE DA SE NE MOŽE ISTI MAIL NAPRAVIT ILI GRAD AKO SE NOVI UNESE DA GA DODA U GRAD, IMA PRIMJER KODA IZNAD U CREATE
+
+            
+            if (id == 0)
             {
-                return BadRequest("Pogresan ID");
-
+                korisnik = new Korisnik();
+                _applicationDbContext.Add(korisnik);
+            }
+            else
+            {
+                korisnik = _applicationDbContext.Korisniks.Find(id);
+                if (korisnik == null)
+                {
+                    return BadRequest("Ne postoji korisnik sa tim IDom");
+                }
             }
 
             korisnik.Ime = x.ime;
@@ -156,6 +166,7 @@ namespace RentAPI.Controllers
             korisnik.Username = x.username;
             korisnik.GradId = x.gradId;
             korisnik.TipKorisnikaId = x.tipKorisnikaId;
+            korisnik.Password = x.passwordSalt;
 
 
 
@@ -163,11 +174,10 @@ namespace RentAPI.Controllers
             return Ok(korisnik);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteKorisnik([FromRoute] int id)
+        [HttpDelete("{id}")]
+        public ActionResult DeleteKorisnik(int id)
         {
-            var korisnik = await _applicationDbContext.Korisniks.FindAsync(id);
+            var korisnik =  _applicationDbContext.Korisniks.Find(id);
 
 
             if (korisnik == null)
@@ -175,8 +185,8 @@ namespace RentAPI.Controllers
                 return NotFound();
             }
 
-            _applicationDbContext.Korisniks.Remove(korisnik);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Remove(korisnik);
+            _applicationDbContext.SaveChanges();
             return Ok(korisnik);
         }
 

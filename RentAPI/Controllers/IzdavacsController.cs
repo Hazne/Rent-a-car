@@ -63,16 +63,23 @@ namespace RentAPI.Controllers
             return Ok(izdavac);
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public ActionResult UpdateIzdavac([FromRoute] int id, IzdavacVM x)
+        [HttpPost("{id}")]
+        public ActionResult UpdateIzdavac(int id,[FromBody] IzdavacVM x)
         {
-            var izdavac = _applicationDbContext.Izdavacs.Find(id);
+            Izdavac izdavac;
 
-            if (izdavac == null)
+            if (id == 0)
             {
-                return BadRequest("Pogresan ID");
-
+                izdavac = new Izdavac();
+                _applicationDbContext.Add(izdavac);
+            }
+            else
+            {
+                izdavac = _applicationDbContext.Izdavacs.Find(id);
+                if (izdavac == null)
+                {
+                    return BadRequest("Ne posotoji taj Izdavac Id");
+                }
             }
 
             izdavac.BrojMobitela = x.BrojMobitela;
@@ -87,11 +94,10 @@ namespace RentAPI.Controllers
             return Ok(izdavac);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteIzdavac([FromRoute] int id)
+        [HttpDelete("{id}")]
+        public ActionResult DeleteIzdavac(int id)
         {
-            var izdavac = await _applicationDbContext.Izdavacs.FindAsync(id);
+            var izdavac =  _applicationDbContext.Izdavacs.Find(id);
 
 
             if (izdavac == null)
@@ -100,8 +106,8 @@ namespace RentAPI.Controllers
 
             }
 
-            _applicationDbContext.Izdavacs.Remove(izdavac);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Remove(izdavac);
+            _applicationDbContext.SaveChanges();
             return Ok(izdavac);
         }
     }

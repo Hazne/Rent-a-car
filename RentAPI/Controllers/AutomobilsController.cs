@@ -79,15 +79,25 @@ namespace RentAPI.Controllers
             return Ok(automobil);
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public ActionResult UpdateAutomobil([FromRoute] int id, AutomobilVM updateAutomobilRequest)
-        {
-            var automobil = _applicationDbContext.Automobils.Find(id);
 
-            if (automobil == null)
+        //potrebno sliku sredit
+        [HttpPost("{id}")]
+        public ActionResult UpdateAutomobil(int id,[FromBody] AutomobilVM updateAutomobilRequest)
+        {
+            Automobil automobil = _applicationDbContext.Automobils.Find(id);
+
+            if (id == 0)
             {
-                return BadRequest("Pogresan Id");
+                automobil = new Automobil();
+                _applicationDbContext.Add(automobil);
+            }
+            else
+            {
+                automobil = _applicationDbContext.Automobils.Find(id);
+                if (automobil == null)
+                {
+                    return BadRequest("Pogresan Id");
+                }
             }
 
             automobil.BrojAutomobila = updateAutomobilRequest.BrojAutomobila;
@@ -103,17 +113,17 @@ namespace RentAPI.Controllers
             automobil.Status = updateAutomobilRequest.Status;
             automobil.IzdavacId = updateAutomobilRequest.IzdavacId;
             automobil.ModelAutomobilaId = updateAutomobilRequest.ModelAutomobilaId;
+            automobil.TipAutomobilaId = updateAutomobilRequest.TipAutomobilaId;
            
 
             _applicationDbContext.SaveChanges();
             return Ok(automobil);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteAutomobil([FromRoute] int id)
+        [HttpDelete("{id}")]
+        public ActionResult DeleteAutomobil(int id)
         {
-            var automobil = await _applicationDbContext.Automobils.FindAsync(id);
+            var automobil = _applicationDbContext.Automobils.Find(id);
 
 
             if (automobil == null)
@@ -121,8 +131,8 @@ namespace RentAPI.Controllers
                 return NotFound();
             }
 
-            _applicationDbContext.Automobils.Remove(automobil);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.Remove(automobil);
+            _applicationDbContext.SaveChanges();
             return Ok(automobil);
         }
     }

@@ -49,32 +49,42 @@ namespace RentAPI.Controllers
             return Ok(rezervisanje);
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> UpdateRezervisanje([FromRoute] int id, Rezervisanje updateRezervisanjeRequest)
+        [HttpPost("{id}")]
+        public ActionResult UpdateRezervisanje(int id,[FromBody] Rezervisanje updateRezervisanjeRequest)
         {
-            var rezervisanje = await _applicationDbContext.Rezervisanjes.FindAsync(id);
+            Rezervisanje rezervisanje;
 
-            if (rezervisanje == null)
+            if (id == 0)
             {
-                return NotFound();
+                rezervisanje = new Rezervisanje();
+                _applicationDbContext.Add(rezervisanje);
+            }
+            else
+            {
+                rezervisanje = _applicationDbContext.Rezervisanjes.Find(id);
+                if (rezervisanje == null)
+                {
+                    return BadRequest("Ne postoji ID");
+                }
             }
 
             rezervisanje.StatusOcjene = updateRezervisanjeRequest.StatusOcjene;
             rezervisanje.StatusKomentara = updateRezervisanjeRequest.StatusKomentara;
             rezervisanje.Automobil = updateRezervisanjeRequest.Automobil;
+            rezervisanje.AutomobilId = updateRezervisanjeRequest.AutomobilId;
             rezervisanje.DatumPocetka = updateRezervisanjeRequest.DatumPocetka;
             rezervisanje.DatumZavrsetka = updateRezervisanjeRequest.DatumZavrsetka;
+            rezervisanje.Korisnik = updateRezervisanjeRequest.Korisnik;
+            rezervisanje.KorisnikId = updateRezervisanjeRequest.KorisnikId;
 
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.SaveChanges();
             return Ok(rezervisanje);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteRezervisanje([FromRoute] int id)
+        [HttpDelete("{id}")]
+        public ActionResult DeleteRezervisanje( int id)
         {
-            var rezervisanje = await _applicationDbContext.Rezervisanjes.FindAsync(id);
+            var rezervisanje = _applicationDbContext.Rezervisanjes.Find(id);
 
 
             if (rezervisanje == null)
@@ -83,7 +93,7 @@ namespace RentAPI.Controllers
             }
 
             _applicationDbContext.Rezervisanjes.Remove(rezervisanje);
-            await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.SaveChanges();
             return Ok(rezervisanje);
         }
     }
