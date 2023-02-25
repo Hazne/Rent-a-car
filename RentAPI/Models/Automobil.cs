@@ -17,7 +17,6 @@ namespace RentAPI.Models
         public string Kolometraza { get; set; }
         public string Vuca { get; set; }
         public int BrojSjedala { get; set; }
-        public bool? Status { get; set; }
 
         [ForeignKey(nameof(Izdavac))]
         public int IzdavacId { get; set; }

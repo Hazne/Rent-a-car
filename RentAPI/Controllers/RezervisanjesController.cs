@@ -1,30 +1,52 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RentAPI.Data;
+using RentAPI.Helper;
 using RentAPI.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace RentAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]/[action]")]
     public class RezervisanjesController : Controller
     {
         
         public readonly ApplicationDbContext _applicationDbContext;
+       
         public RezervisanjesController(ApplicationDbContext applicationDbContext)
         {
             _applicationDbContext = applicationDbContext;
+           
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult GetProvjeraDatuma(int id)
+        {
+            var rezervacija = _applicationDbContext.Rezervisanjes.Where(x=>x.AutomobilId== id).OrderBy(x=>x.DatumZavrsetka).LastOrDefault();
+
+
+            return Ok(rezervacija);
         }
 
 
         [HttpGet]
 
-        public async Task<IActionResult> GetAllRezervisanjes()
+        public ActionResult<List<Rezervisanje>> GetAllRezervisanjes()
         {
-            var rezervisanjes = await _applicationDbContext.Rezervisanjes.ToListAsync();
+            var rezervisanjes = _applicationDbContext.Rezervisanjes
+                //.Include(s => s.Korisnik)
+                //.Include(s => s.Automobil)
+                .OrderBy(s => s.RezervisanjeId).AsQueryable();
 
-            return Ok(rezervisanjes);
+            return rezervisanjes.Take(100).ToList();
         }
 
         [HttpPost]

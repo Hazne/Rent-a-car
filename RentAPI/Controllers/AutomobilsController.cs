@@ -20,7 +20,6 @@ namespace RentAPI.Controllers
             _applicationDbContext = applicationDbContext;
         }
 
-
         [HttpGet]
 
         public ActionResult<List<Automobil>> GetAllAutomobils()
@@ -49,7 +48,6 @@ namespace RentAPI.Controllers
                 Kolometraza = x.Kolometraza,
                 Vuca = x.Vuca,
                 BrojSjedala = x.BrojSjedala,
-                Status = x.Status,
                 IzdavacId = x.IzdavacId,
                 TipGorivaId = x.TipGorivaId,
                 TipAutomobilaId = x.TipAutomobilaId,
@@ -110,7 +108,6 @@ namespace RentAPI.Controllers
             automobil.Vuca = updateAutomobilRequest.Vuca;
             automobil.Kolometraza = updateAutomobilRequest.Kolometraza;
             automobil.Opis = updateAutomobilRequest.Opis;
-            automobil.Status = updateAutomobilRequest.Status;
             automobil.IzdavacId = updateAutomobilRequest.IzdavacId;
             automobil.ModelAutomobilaId = updateAutomobilRequest.ModelAutomobilaId;
             automobil.TipAutomobilaId = updateAutomobilRequest.TipAutomobilaId;

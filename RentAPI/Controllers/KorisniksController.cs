@@ -25,7 +25,6 @@ namespace RentAPI.Controllers
     public class KorisniksController : Controller
     {
         public readonly ApplicationDbContext _applicationDbContext;
-        private readonly IConfiguration _config;
 
         public KorisniksController(ApplicationDbContext applicationDbContext)
         {
@@ -98,9 +97,8 @@ namespace RentAPI.Controllers
             return Ok("Success");
         }
 
-        [HttpGet]
-        [Route("{id}")]
-        public ActionResult GetKorisnik([FromRoute] int id)
+        [HttpGet("{id}")]
+        public ActionResult GetKorisnik(int id)
         {
             var korisnik = _applicationDbContext.Korisniks
                 .Include(x => x.TipKorisnika)
@@ -113,7 +111,7 @@ namespace RentAPI.Controllers
             return Ok(korisnik);
         }
 
-        
+
         [HttpPost("LoginUser")]
         public async Task<IActionResult> Login([FromBody]Login userObj)
         {
@@ -199,7 +197,8 @@ namespace RentAPI.Controllers
             var identity = new ClaimsIdentity(new Claim[]
             {
                 new Claim(ClaimTypes.Role, tipKorisnika.Tip.ToString()),
-                new Claim(ClaimTypes.Name, $"{korisnik.Ime} {korisnik.Prezime}")
+                new Claim(ClaimTypes.Name, korisnik.Username.ToString()),
+                new Claim("id", korisnik.KorisnikId.ToString()),
             });
 
             var credientials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
