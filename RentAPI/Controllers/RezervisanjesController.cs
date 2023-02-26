@@ -50,13 +50,26 @@ namespace RentAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddRezervisanje([FromBody] Rezervisanje rezervisanjeRequest)
+        public ActionResult<Rezervisanje> AddRezervisanje([FromBody] RezervisanjeVM x)
         {
 
-            await _applicationDbContext.Rezervisanjes.AddAsync(rezervisanjeRequest);
-            await _applicationDbContext.SaveChangesAsync();
+            var korisnik = _applicationDbContext.Korisniks.Find(x.KorisnikId);
 
-            return Ok(rezervisanjeRequest);
+            if (korisnik == null)
+            {
+                return BadRequest("Korisnik ne postoji");
+            }
+
+            var nova = new Rezervisanje();
+            _applicationDbContext.Add(nova);
+
+            nova.DatumPocetka = x.DatumPocetka;
+            nova.DatumZavrsetka= x.DatumZavrsetka;
+            nova.KorisnikId = x.KorisnikId;
+            nova.AutomobilId= x.AutomobilId;
+
+            _applicationDbContext.SaveChanges();
+            return Ok(nova);
         }
 
         [HttpGet]
