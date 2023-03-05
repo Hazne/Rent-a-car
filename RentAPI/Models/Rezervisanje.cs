@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace RentAPI.Models
 {
@@ -12,9 +13,12 @@ namespace RentAPI.Models
         public bool? StatusKomentara { get; set; }
         [ForeignKey(nameof(Korisnik))]
         public int KorisnikId { get; set; }
+
+        [JsonIgnore]
         public  Korisnik Korisnik { get; set; }
         [ForeignKey(nameof(Automobil))]
         public int AutomobilId { get; set; }
         public  Automobil Automobil { get; set; }
+   
     }
 }

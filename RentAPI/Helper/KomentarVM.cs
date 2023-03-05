@@ -10,7 +10,6 @@ namespace RentAPI.Helper
         public DateTime DatumKomentara { get; set; }
         public int KorisnikId { get; set; }
         public int AutomobilId { get; set; }
-
-
+        public int RezervisanjeId { get; set; }
     }
 }

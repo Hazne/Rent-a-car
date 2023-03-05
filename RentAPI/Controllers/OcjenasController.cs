@@ -11,7 +11,7 @@ using RentAPI.Helper;
 namespace RentAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]/[action]")]
     public class OcjenasController : Controller
     {
         public readonly ApplicationDbContext _applicationDbContext;
@@ -25,12 +25,11 @@ namespace RentAPI.Controllers
         public ActionResult<List<Ocjena>> GetAllOcjene()
         {
             var data = _applicationDbContext.Ocjenas
-                .Include(x => x.Korisnik)
-                .Include(x => x.Automobil)
                 .OrderBy(x => x.OcjenaId).AsQueryable();
 
             return data.Take(100).ToList();
         }
+
 
         [HttpGet]
         [Route("{id}")]
@@ -56,12 +55,22 @@ namespace RentAPI.Controllers
                 DatumOcjene = x.DatumOcjene,
                 KorisnikId = x.KorisnikId,
                 AutomobilId = x.AutomobilId,
+                RezervisanjeId = x.RezervisanjeId
             };
 
+            StatusOcjene(newOcjena.RezervisanjeId);
             _applicationDbContext.Add(newOcjena);
             _applicationDbContext.SaveChanges();
 
             return newOcjena;
+        }
+
+        private void StatusOcjene(int rezervisanjeId)
+        {
+            var rezervacija = _applicationDbContext.Rezervisanjes.Find(rezervisanjeId);
+
+            rezervacija.StatusOcjene = true;
+
         }
 
         [HttpPost("{id}")]

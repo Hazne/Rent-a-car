@@ -11,7 +11,7 @@ using System;
 namespace RentAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]/[action]")]
     public class KomentarsController : Controller
     {
         public readonly ApplicationDbContext _applicationDbContext;
@@ -22,12 +22,9 @@ namespace RentAPI.Controllers
 
 
         [HttpGet]
-
         public ActionResult<List<Komentar>> GetAllKomentars()
         {
             var data = _applicationDbContext.Komentars
-                .Include(x=>x.Korisnik)
-                .Include(x=>x.Automobil)
                 .OrderBy(x => x.KomentarId)
                 .AsQueryable();
 
@@ -43,11 +40,20 @@ namespace RentAPI.Controllers
                 DatumKomentara = x.DatumKomentara,
                 KorisnikId = x.KorisnikId,
                 AutomobilId = x.AutomobilId,
+                RezervisanjeId= x.RezervisanjeId,
             };
 
+            StatusKomentara(newKomentar.RezervisanjeId);
             _applicationDbContext.Add(newKomentar);
             _applicationDbContext.SaveChanges();
             return newKomentar;
+        }
+
+        private void StatusKomentara(int rezervisanjeId)
+        {
+            var rezervisanje = _applicationDbContext.Rezervisanjes.Find(rezervisanjeId);
+
+            rezervisanje.StatusKomentara = true; 
         }
 
         [HttpGet]

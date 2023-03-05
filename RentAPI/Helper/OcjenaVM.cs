@@ -12,5 +12,6 @@ namespace RentAPI.Helper
         
         public int AutomobilId { get; set; }
         public DateTime DatumOcjene { get; set; }
+        public int RezervisanjeId { get; set; }
     }
 }
