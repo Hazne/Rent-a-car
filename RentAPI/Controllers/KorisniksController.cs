@@ -111,6 +111,7 @@ namespace RentAPI.Controllers
             return Ok(korisnik);
         }
 
+      
 
         [HttpPost("LoginUser")]
         public async Task<IActionResult> Login([FromBody]Login userObj)

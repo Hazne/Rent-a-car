@@ -22,7 +22,8 @@ namespace RentAPI.Data
         public DbSet<TipAutomobila> TipAutomobilas { get; set;}
         public DbSet<TipGoriva> TipGorivas { get; set;}
         public DbSet<TipKorisnika> TipKorisnikas { get; set;}
-
+        public DbSet<ForgotPassword> ForgotPasswords { get; set; }
+        
 
     }
 }
