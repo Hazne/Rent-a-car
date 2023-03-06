@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RentAPI.Data;
+using RentAPI.Helper;
 using RentAPI.Models;
 using System.Linq;
 
@@ -31,6 +32,24 @@ namespace RentAPI.Controllers
             {
                 return Ok(true);
             }
+        }
+
+        [HttpGet("{email}")]
+        public ActionResult ForggotPassword(string email)
+        {
+            string novaSifra=HelperClass.NovaSifraGenerator();
+
+            var korisnik = _applicationDbContext.Korisniks.FirstOrDefault(x=>x.Email== email);
+
+            if(korisnik==null)
+                return BadRequest("Ne postoji korisnik sa tim emailom");
+
+            korisnik.Password = novaSifra;
+            _applicationDbContext.SaveChanges();
+
+            HelperClass.PosaljiMailNoviPassword(email, novaSifra);
+
+            return Ok("Proslo");
         }
     }
 }
