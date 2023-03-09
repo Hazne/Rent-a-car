@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RentAPI.Data;
 
@@ -11,9 +12,10 @@ using RentAPI.Data;
 namespace RentAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230306191518_promjena-forgot-u-twofactor")]
+    partial class promjenaforgotutwofactor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -383,7 +385,7 @@ namespace RentAPI.Migrations
                     b.Property<DateTime>("DatumIsteka")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsProvjerena")
+                    b.Property<bool>("IsValid")
                         .HasColumnType("bit");
 
                     b.Property<int>("KorisnikId")

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RentAPI.Data;
 
@@ -11,9 +12,10 @@ using RentAPI.Data;
 namespace RentAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230306231220_delete-isValid-from-TwoFactor")]
+    partial class deleteisValidfromTwoFactor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -382,9 +384,6 @@ namespace RentAPI.Migrations
 
                     b.Property<DateTime>("DatumIsteka")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsProvjerena")
-                        .HasColumnType("bit");
 
                     b.Property<int>("KorisnikId")
                         .HasColumnType("int");
