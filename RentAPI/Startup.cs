@@ -42,6 +42,7 @@ namespace RentAPI
             services.AddSwaggerGen();
             services.AddCoreAdmin();
             services.AddHttpContextAccessor();
+            services.AddSingleton<IConfiguration>(Configuration);
             //added theese two lines of code
             services.AddControllers().AddNewtonsoftJson(options =>
                  options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
