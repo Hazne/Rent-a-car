@@ -104,7 +104,7 @@ namespace RentAPI.Controllers
             }
 
             _applicationDbContext.Remove(modelAutomobila);
-            _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.SaveChanges();
             return Ok(modelAutomobila);
         }
     }

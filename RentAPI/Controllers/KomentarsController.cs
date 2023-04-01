@@ -95,7 +95,10 @@ namespace RentAPI.Controllers
             komentar.Opis = updateKomentarRequest.Opis;
             komentar.KorisnikId = updateKomentarRequest.KorisnikId;
             komentar.Korisnik = updateKomentarRequest.Korisnik;
+            komentar.RezervisanjeId = updateKomentarRequest.RezervisanjeId;
+            komentar.Rezervisanje = updateKomentarRequest.Rezervisanje;
 
+            StatusKomentara(komentar.RezervisanjeId);
             _applicationDbContext.SaveChanges();
             return Ok(komentar);
         }

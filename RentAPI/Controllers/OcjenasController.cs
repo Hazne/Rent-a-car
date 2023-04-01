@@ -74,7 +74,7 @@ namespace RentAPI.Controllers
         }
 
         [HttpPost("{id}")]
-        public ActionResult UpdateOcjena(int id,[FromBody] OcjenaVM x)
+        public ActionResult UpdateOcjena(int id,[FromBody] Ocjena x)
         {
             Ocjena ocjena;
 
@@ -98,10 +98,24 @@ namespace RentAPI.Controllers
             ocjena.BrojOcjene = x.BrojOcjene;
             ocjena.DatumOcjene = x.DatumOcjene;
             ocjena.AutomobilId = x.AutomobilId;
+            ocjena.Automobil = x.Automobil;
             ocjena.KorisnikId = x.KorisnikId;
-            
+            ocjena.Korisnik = x.Korisnik;
+            ocjena.RezervisanjeId = x.RezervisanjeId;
 
-            _applicationDbContext.SaveChanges();
+            var korisnik = _applicationDbContext.Korisniks.FirstOrDefault(k => k.KorisnikId == x.KorisnikId);
+            if (korisnik != null)
+            {
+                ocjena.Korisnik = korisnik;
+            }
+            else
+            {
+                // Return an error message if the "Korisnik" object does not exist
+                return BadRequest("Korisnik ne postoji");
+            }
+
+            StatusOcjene(ocjena.RezervisanjeId);
+             _applicationDbContext.SaveChanges();
             return Ok(ocjena);
         }
 
